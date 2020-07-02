@@ -33,11 +33,23 @@ class ProductTest < ActiveSupport::TestCase
 
   #TEST - 3
   test "image url validity" do
-    ok = %w{ fred.gif fred.jpg fred.png FRED.JPG FRED.Jpg http://a.b.c/x/y/z/fred.gif }
+    ok = %w{ fred.gif fred.jpg fred.png FRED.JPG FRED.Jpg http://a.b.c/x/y/z/fred.gif}
     bad = %w{ fred.doc fred.gif/more fred.gif.more }
     ok.each do |image_url|
-    assert new_product(image_url).valid?, "#{image_url} shouldn't be invalid"
+      assert new_product(image_url).valid?, "#{image_url} shouldn't be invalid"
+    end
+    bad.each do |image_url|
+      assert new_product(image_url).invalid?, "#{image_url} shouldn't be valid"
     end
   end
-  
+
+  #TEST - 4
+  test "unique product title is required" do
+  product = Product.new(title: products(:ruby).title,
+  description: "yyy",
+  price: 1,
+  image_url: "fred.gif")
+  assert product.invalid?
+  assert_equal ["has already been taken"], product.errors[:title]
+  end
 end
